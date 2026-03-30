@@ -74,3 +74,72 @@ document.querySelectorAll('.svc-box, .svc-detail-card, .why-box, .testi-box, .ex
   el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
   observer.observe(el);
 });
+
+// ===== GOLDEN CURSOR PARTICLE EFFECT =====
+(function() {
+  const colors = ['#c9a84c', '#f0d080', '#ffe066', '#fff0a0', '#d4a017'];
+
+  function spawnParticle(x, y) {
+    const dot = document.createElement('div');
+    const size = Math.random() * 8 + 4;
+    const angle = Math.random() * 2 * Math.PI;
+    const speed = Math.random() * 60 + 30;
+    const tx = Math.cos(angle) * speed;
+    const ty = Math.sin(angle) * speed;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const duration = Math.random() * 500 + 400;
+
+    dot.style.cssText = `
+      position: fixed;
+      left: ${x}px;
+      top: ${y}px;
+      width: ${size}px;
+      height: ${size}px;
+      border-radius: 50%;
+      background: ${color};
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 ${size * 2}px ${color};
+      transition: transform ${duration}ms ease-out, opacity ${duration}ms ease-out;
+    `;
+    document.body.appendChild(dot);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        dot.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px))`;
+        dot.style.opacity = '0';
+      });
+    });
+
+    setTimeout(() => dot.remove(), duration);
+  }
+
+  // Desktop
+  let moveThrottle = false;
+  document.addEventListener('mousemove', (e) => {
+    if (moveThrottle) return;
+    moveThrottle = true;
+    setTimeout(() => moveThrottle = false, 30);
+    for (let i = 0; i < 2; i++) spawnParticle(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('click', (e) => {
+    for (let i = 0; i < 12; i++) spawnParticle(e.clientX, e.clientY);
+  });
+
+  // Mobile — attach to window to catch all touches
+  let touchThrottle = false;
+  window.addEventListener('touchmove', (e) => {
+    if (touchThrottle) return;
+    touchThrottle = true;
+    setTimeout(() => touchThrottle = false, 30);
+    const t = e.touches[0];
+    for (let i = 0; i < 3; i++) spawnParticle(t.clientX, t.clientY);
+  }, { passive: true, capture: true });
+
+  window.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    for (let i = 0; i < 10; i++) spawnParticle(t.clientX, t.clientY);
+  }, { passive: true, capture: true });
+})();
