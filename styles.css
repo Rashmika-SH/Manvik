@@ -470,3 +470,6 @@ footer { background: rgba(6,0,26,0.92); border-top: 1px solid var(--glass-border
 }
 .float-btn.whatsapp { background: #25D366; }
 .float-btn.phone    { background: var(--gold); }
+
+/* ===== PREVENT PHONE NUMBER AUTO-LINK STYLING ===== */
+a[href^="tel"] { color: inherit; text-decoration: none; }
