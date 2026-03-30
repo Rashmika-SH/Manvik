@@ -51,18 +51,66 @@ document.querySelectorAll('.nav-links a').forEach(link => {
   link.addEventListener('click', () => document.querySelector('.nav-links').classList.remove('open'));
 });
 
-// ===== NAVBAR SCROLL =====
+// ===== POPULATE YEAR DROPDOWNS =====
+(function() {
+  const currentYear = new Date().getFullYear();
+  ['dob_year_contact', 'dob_year_index'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    for (let y = currentYear; y >= 1940; y--) {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y;
+      sel.appendChild(opt);
+    }
+  });
+})();
 window.addEventListener('scroll', () => {
   const nav = document.getElementById('navbar');
   if (!nav) return;
   nav.style.background = window.scrollY > 50 ? 'rgba(6,0,26,0.96)' : 'rgba(6,0,26,0.82)';
 });
 
-// ===== CONTACT FORM =====
+// ===== CONTACT FORM WITH EMAILJS =====
 function handleSubmit(e) {
   e.preventDefault();
-  const s = document.getElementById('form-success');
-  if (s) { s.classList.remove('hidden'); e.target.reset(); setTimeout(() => s.classList.add('hidden'), 5000); }
+  const form = e.target;
+  const btn = form.querySelector('button[type="submit"]');
+  const success = document.getElementById('form-success');
+  const error = document.getElementById('form-error');
+
+  const params = {
+    name:    form.querySelector('[name="name"]').value,
+    email:   form.querySelector('[name="email"]').value,
+    dob:     [
+               form.querySelector('[name="dob_day"]') ? form.querySelector('[name="dob_day"]').value : '',
+               form.querySelector('[name="dob_month"]') ? form.querySelector('[name="dob_month"]').value : '',
+               form.querySelector('[name="dob_year"]') ? form.querySelector('[name="dob_year"]').value : ''
+             ].filter(Boolean).join(' ') || 'Not provided',
+    service: form.querySelector('[name="service"]') ? form.querySelector('[name="service"]').value : 'Not specified',
+    message: form.querySelector('[name="message"]').value,
+    time:    new Date().toLocaleString()
+  };
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  emailjs.send('service_hgt6yak', 'template_adjv2l3', params)
+    .then(() => {
+      if (success) {
+      success.classList.remove('hidden');
+      setTimeout(() => success.classList.add('hidden'), 6000);
+    }
+      form.reset();
+    })
+    .catch((err) => {
+      console.error('EmailJS error:', err);
+      if (error) { error.classList.remove('hidden'); setTimeout(() => error.classList.add('hidden'), 5000); }
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = 'Send Message ✦';
+    });
 }
 
 // ===== FADE IN ON SCROLL =====
