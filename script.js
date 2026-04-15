@@ -75,43 +75,36 @@ window.addEventListener('scroll', () => {
 function handleSubmit(e) {
   e.preventDefault();
   const form = e.target;
-  const btn = form.querySelector('button[type="submit"]');
   const success = document.getElementById('form-success');
-  const error = document.getElementById('form-error');
 
-  const params = {
-    name:    form.querySelector('[name="name"]').value,
-    email:   form.querySelector('[name="email"]').value,
-    dob:     [
-               form.querySelector('[name="dob_day"]') ? form.querySelector('[name="dob_day"]').value : '',
-               form.querySelector('[name="dob_month"]') ? form.querySelector('[name="dob_month"]').value : '',
-               form.querySelector('[name="dob_year"]') ? form.querySelector('[name="dob_year"]').value : ''
-             ].filter(Boolean).join(' ') || 'Not provided',
-    service: form.querySelector('[name="service"]') ? form.querySelector('[name="service"]').value : 'Not specified',
-    message: form.querySelector('[name="message"]').value,
-    time:    new Date().toLocaleString()
-  };
+  const name    = form.querySelector('[name="name"]').value;
+  const email   = form.querySelector('[name="email"]').value;
+  const day     = form.querySelector('[name="dob_day"]') ? form.querySelector('[name="dob_day"]').value : '';
+  const month   = form.querySelector('[name="dob_month"]') ? form.querySelector('[name="dob_month"]').value : '';
+  const year    = form.querySelector('[name="dob_year"]') ? form.querySelector('[name="dob_year"]').value : '';
+  const dob     = [day, month, year].filter(Boolean).join(' ') || 'Not provided';
+  const service = form.querySelector('[name="service"]') ? form.querySelector('[name="service"]').value : 'Not specified';
+  const message = form.querySelector('[name="message"]').value;
 
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
+  const text = `Hello Psychic Tulsi Ram,%0A%0A` +
+    `*Name:* ${encodeURIComponent(name)}%0A` +
+    `*Email:* ${encodeURIComponent(email)}%0A` +
+    `*Date of Birth:* ${encodeURIComponent(dob)}%0A` +
+    `*Service:* ${encodeURIComponent(service)}%0A` +
+    `*Message:* ${encodeURIComponent(message)}`;
 
-  emailjs.send('service_hgt6yak', 'template_adjv2l3', params)
-    .then(() => {
-      if (success) {
-      success.classList.remove('hidden');
-      setTimeout(() => success.classList.add('hidden'), 6000);
-    }
-      form.reset();
-    })
-    .catch((err) => {
-      console.error('EmailJS error:', err);
-      if (error) { error.classList.remove('hidden'); setTimeout(() => error.classList.add('hidden'), 5000); }
-    })
-    .finally(() => {
-      btn.disabled = false;
-      btn.textContent = 'Send Message ✦';
-    });
+  if (success) {
+    success.classList.remove('hidden');
+    setTimeout(() => success.classList.add('hidden'), 6000);
+  }
+
+  form.reset();
+
+  setTimeout(() => {
+    window.open(`https://wa.me/61452606444?text=${text}`, '_blank');
+  }, 800);
 }
+
 
 // ===== FADE IN ON SCROLL =====
 const observer = new IntersectionObserver(entries => {
